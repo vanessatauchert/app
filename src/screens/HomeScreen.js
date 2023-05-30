@@ -1,17 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text } from 'react-native';
+import React from 'react';
+import { View, Text, Button } from 'react-native';
 
-const HomeScreen = () => {
-  const [data, setData] = useState([]);
-
-  useEffect(() => {
-    // Lógica para buscar dados da API ou do armazenamento interno
-    // e atualizar o estado com setData
-  }, []);
+const HomeScreen = ({ navigation }) => {
+  const handleGoToPokedex = () => {
+    navigation.navigate('Pokedex');
+  };
 
   return (
     <View>
-      <Text>{data}</Text>
+      <Text>Bem-vindo à Pokédex!</Text>
+      <Button title="Ir para a Pokédex" onPress={handleGoToPokedex} />
     </View>
   );
 };
