@@ -28,6 +28,10 @@ const MyPokemonsScreen = () => {
     }
   };
 
+  const handleReload = () => {
+    fetchPokemonList(); // Recarrega a lista de Pokémon
+  };
+
   const renderPokemonItem = ({ item }) => {
     return (
       <View>
@@ -41,6 +45,9 @@ const MyPokemonsScreen = () => {
 
   return (
     <View>
+      <TouchableOpacity onPress={handleReload}>
+        <Text>Atualizar Lista</Text>
+      </TouchableOpacity>
       <FlatList
         data={pokemonList}
         keyExtractor={(item) => item.id.toString()}
