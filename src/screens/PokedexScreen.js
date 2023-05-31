@@ -85,8 +85,8 @@ const PokedexScreen = () => {
 
     return (
       <Card style={cardStyle}>
-        <Card.Cover source={{ uri: item.image }} style={styles.cardImage} />
-        <Card.Content>
+        <Card.Cover source={{ uri: item.image }} style={styles.cardImage} resizeMode="contain" />
+        <Card.Content style={styles.cardContent}>
           <Title style={styles.cardTitle}>{item.name}</Title>
           <Button onPress={() => handleAddToMyPokemons(item)}>
             {isSaved ? 'Salvo' : 'Salvar'}
@@ -125,15 +125,19 @@ const styles = {
     elevation: 3,
   },
   cardImage: {
-    height: 200,
+    height: 150,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
+  },
+  cardContent: {
+    alignItems: 'center',
   },
   cardTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     marginTop: 10,
     color: '#fff',
+    textAlign: 'center',
   },
 };
 
