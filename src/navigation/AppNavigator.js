@@ -45,12 +45,25 @@ const AppNavigator = () => {
 };
 
 const getTabBarLabel = (route) => {
-  // Implemente a lógica para retornar o label da aba com base no nome da rota
+ 
 };
 
 const getTabBarIcon = (route, color, size) => {
-  // Implemente a lógica para retornar o ícone da aba com base no nome da rota
+  let iconName;
+
+  if (route.name === 'Home') {
+    iconName = 'home';
+  } else if (route.name === 'Pokedex') {
+    iconName = 'book'; // Nome do ícone personalizado
+  } else if (route.name === 'MyPokemons') {
+    iconName = 'list';
+  }
+
+  // Retorna o ícone personalizado
+  return <Icon name={iconName} size={size} color={color} />;
 };
+
+
 
 const PokedexStack = () => {
   return (

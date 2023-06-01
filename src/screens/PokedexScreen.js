@@ -105,7 +105,7 @@ const PokedexScreen = () => {
     }
   };
 
-  const renderPokemonItem = ({ item }) => {
+  const renderPokemonItem = ({ item, index }) => {
     const typeColors = {
       grass: '#8ED752',
       fire: '#FF9C54',
@@ -130,20 +130,22 @@ const PokedexScreen = () => {
     const cardStyle = {
       backgroundColor: typeColors[item.type] || '#fff',
       marginBottom: 10,
-      flex: 1,
       margin: 8,
       borderRadius: 8,
+      flexGrow: 1,
     };
 
     const cardImageStyle = {
       backgroundColor: Color(cardStyle.backgroundColor).lighten(0.3).hex(),
       borderTopLeftRadius: 8,
       borderTopRightRadius: 8,
+      aspectRatio: 1,
     };
 
     const saveButtonStyle = {
       backgroundColor: item.isSaved ? '#E46E60' : '#BC4132',
       marginTop: 10,
+      flex: 1,
     };
 
     const saveButtonTextStyle = {
@@ -203,12 +205,13 @@ const PokedexScreen = () => {
     <View style={{ flex: 1 }}>
       <FlatList
         data={pokemons}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item, index) => item.id.toString()+ '_' + index.toString()}
         numColumns={2}
         renderItem={renderPokemonItem}
         ListFooterComponent={renderFooter}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
+        contentContainerStyle={{ flexGrow: 1 }} 
       />
     </View>
   );
