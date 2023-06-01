@@ -1,61 +1,39 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Função para salvar a lista de Pokémon no AsyncStorage
-export const savePokemonList = async (pokemonList) => {
-  try {
-    await AsyncStorage.setItem('pokemonList', JSON.stringify(pokemonList));
-    console.log('Lista de Pokémon salva com sucesso!');
-  } catch (error) {
-    console.error('Erro ao salvar a lista de Pokémon:', error);
-  }
-};
+// Chave para armazenar a lista de Pokémon
+const STORAGE_KEY = 'SAVED_POKEMONS';
 
-// Função para recuperar a lista de Pokémon do AsyncStorage
+// Obtém a lista de Pokémon salvos do armazenamento local
 export const getPokemonList = async () => {
   try {
-    const savedPokemonList = await AsyncStorage.getItem('pokemonList');
-
-    if (savedPokemonList) {
-      return JSON.parse(savedPokemonList);
+    const savedPokemonsJSON = await AsyncStorage.getItem(STORAGE_KEY);
+    if (savedPokemonsJSON) {
+      return JSON.parse(savedPokemonsJSON);
     }
-
     return [];
   } catch (error) {
-    console.error('Erro ao recuperar a lista de Pokémon:', error);
-    return [];
+    throw new Error('Erro ao obter a lista de Pokémon salvos do armazenamento.');
   }
 };
 
-// Função para adicionar um novo Pokémon à lista e salvar no AsyncStorage
+// Adiciona um Pokémon à lista de salvos no armazenamento local
 export const addPokemonToList = async (pokemon) => {
   try {
-    const pokemonList = await getPokemonList();
-    pokemonList.push(pokemon);
-    await savePokemonList(pokemonList);
-    console.log('Pokémon adicionado à lista com sucesso!');
+    const savedPokemons = await getPokemonList();
+    savedPokemons.push(pokemon);
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(savedPokemons));
   } catch (error) {
-    console.error('Erro ao adicionar o Pokémon à lista:', error);
+    throw new Error('Erro ao adicionar o Pokémon à lista de salvos no armazenamento.');
   }
 };
 
-// Função para remover um Pokémon da lista e salvar no AsyncStorage
+// Remove um Pokémon da lista de salvos no armazenamento local
 export const removePokemonFromList = async (pokemon) => {
   try {
-    const pokemonList = await getPokemonList();
-    const updatedList = pokemonList.filter((p) => p.id !== pokemon.id);
-    await savePokemonList(updatedList);
-    console.log('Pokémon removido da lista com sucesso!');
+    const savedPokemons = await getPokemonList();
+    const updatedPokemons = savedPokemons.filter((p) => p.id !== pokemon.id);
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPokemons));
   } catch (error) {
-    console.error('Erro ao remover o Pokémon da lista:', error);
-  }
-};
-
-// Função para limpar a lista de Pokémon no AsyncStorage
-export const clearPokemonList = async () => {
-  try {
-    await AsyncStorage.removeItem('pokemonList');
-    console.log('Lista de Pokémon limpa com sucesso!');
-  } catch (error) {
-    console.error('Erro ao limpar a lista de Pokémon:', error);
+    throw new Error('Erro ao remover o Pokémon da lista de salvos no armazenamento.');
   }
 };

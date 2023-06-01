@@ -1,21 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, ActivityIndicator, Text } from 'react-native';
 import { Button, Card, Title } from 'react-native-paper';
 import axios from 'axios';
-import { addPokemonToList, getPokemonList } from '../utils/storage';
+import Color from 'color';
+
+import {
+  addPokemonToList,
+  removePokemonFromList,
+  getPokemonList,
+} from '../utils/storage.js';
 
 const PokedexScreen = () => {
   const [pokemons, setPokemons] = useState([]);
   const [savedPokemons, setSavedPokemons] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [nextPageUrl, setNextPageUrl] = useState(null);
+  const [showSaveMessage, setShowSaveMessage] = useState(false);
 
   useEffect(() => {
     fetchPokemons();
     loadSavedPokemons();
   }, []);
 
-  const fetchPokemons = async () => {
+  const fetchPokemons = async (url) => {
     try {
-      const response = await axios.get('https://pokeapi.co/api/v2/pokemon');
+      setLoading(true);
+      const response = await axios.get(url || 'https://pokeapi.co/api/v2/pokemon');
       const results = response.data.results;
       const pokemonData = await Promise.all(
         results.map(async (pokemon) => {
@@ -23,12 +33,18 @@ const PokedexScreen = () => {
           return {
             id: response.data.id,
             name: response.data.name,
-            image: response.data.sprites.front_default,
+            image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${response.data.id}.png`,
             type: response.data.types[0].type.name,
+            isSaved: false,
           };
         })
       );
-      setPokemons(pokemonData);
+      const filteredPokemonData = pokemonData.filter(
+        (pokemon) => !savedPokemons.some((savedPokemon) => savedPokemon.id === pokemon.id)
+      );
+      setPokemons((prevPokemons) => [...prevPokemons, ...filteredPokemonData]);
+      setNextPageUrl(response.data.next);
+      setLoading(false);
     } catch (error) {
       console.error('Erro ao buscar os Pokémon:', error);
     }
@@ -45,18 +61,38 @@ const PokedexScreen = () => {
 
   const handleAddToMyPokemons = async (pokemon) => {
     try {
-      await addPokemonToList(pokemon);
-      console.log('Pokémon adicionado:', pokemon);
-      loadSavedPokemons(); // Busca novamente a lista de Pokémon salvos
+      const isAlreadySaved = savedPokemons.some((p) => p.id === pokemon.id);
+      if (isAlreadySaved) {
+        setShowSaveMessage(true);
+      } else {
+        await addPokemonToList(pokemon);
+        console.log('Pokémon adicionado:', pokemon);
+        setSavedPokemons((prevSavedPokemons) => [...prevSavedPokemons, pokemon]);
+        setPokemons((prevPokemons) =>
+          prevPokemons.map((p) => (p.id === pokemon.id ? { ...p, isSaved: true } : p))
+        );
+      }
     } catch (error) {
       console.error('Erro ao adicionar o Pokémon:', error);
     }
   };
 
-  const renderPokemonItem = ({ item }) => {
-    const isSaved = savedPokemons.some((p) => p.id === item.id);
+  const handleRemoveFromMyPokemons = async (pokemon) => {
+    try {
+      await removePokemonFromList(pokemon);
+      console.log('Pokémon removido:', pokemon);
+      setSavedPokemons((prevSavedPokemons) =>
+        prevSavedPokemons.filter((p) => p.id !== pokemon.id)
+      );
+      setPokemons((prevPokemons) =>
+        prevPokemons.map((p) => (p.id === pokemon.id ? { ...p, isSaved: false } : p))
+      );
+    } catch (error) {
+      console.error('Erro ao remover o Pokémon:', error);
+    }
+  };
 
-    // Mapear o tipo de Pokémon para a cor de fundo correspondente
+  const renderPokemonItem = ({ item }) => {
     const typeColors = {
       grass: '#8ED752',
       fire: '#FF9C54',
@@ -79,66 +115,86 @@ const PokedexScreen = () => {
     };
 
     const cardStyle = {
-      ...styles.card,
       backgroundColor: typeColors[item.type] || '#fff',
+      marginBottom: 10,
+      flex: 1,
+      margin: 8,
+      borderRadius: 8,
+    };
+
+    const cardImageStyle = {
+      backgroundColor: Color(cardStyle.backgroundColor).lighten(0.3).hex(),
+      borderTopLeftRadius: 8,
+      borderTopRightRadius: 8,
+    };
+
+    const saveButtonStyle = {
+      backgroundColor: item.isSaved ? '#E46E60' : '#BC4132',
+      marginTop: 10,
+    };
+
+    const saveButtonTextStyle = {
+      color: item.isSaved ? '#fff' : '#000',
+    };
+
+    const saveButtonLabel = item.isSaved ? 'Salvo' : 'Salvar';
+
+    const handleSaveButtonPress = () => {
+      if (item.isSaved) {
+        handleRemoveFromMyPokemons(item);
+      } else {
+        handleAddToMyPokemons(item);
+      }
     };
 
     return (
       <Card style={cardStyle}>
-        <Card.Cover source={{ uri: item.image }} style={styles.cardImage} resizeMode="contain" />
-        <Card.Content style={styles.cardContent}>
-          <Title style={styles.cardTitle}>{item.name}</Title>
-          <Button onPress={() => handleAddToMyPokemons(item)}>
-            {isSaved ? 'Salvo' : 'Salvar'}
+        <Card.Cover
+          source={{ uri: item.image }}
+          style={[cardImageStyle, { aspectRatio: 1 }]}
+          resizeMode="contain"
+        />
+        <Card.Content>
+          <Title>{item.name}</Title>
+          {showSaveMessage && (
+            <Text style={{ color: 'red' }}>Este Pokémon já foi salvo</Text>
+          )}
+          <Button
+            onPress={handleSaveButtonPress}
+            style={saveButtonStyle}
+            labelStyle={saveButtonTextStyle}
+          >
+            {saveButtonLabel}
           </Button>
         </Card.Content>
       </Card>
     );
   };
 
+  const renderFooter = () => {
+    if (!loading) return null;
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  };
+
+  const handleLoadMore = () => {
+    if (nextPageUrl) {
+      fetchPokemons(nextPageUrl);
+    }
+  };
+
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1 }}>
       <FlatList
         data={pokemons}
         keyExtractor={(item) => item.id.toString()}
         numColumns={2}
-        columnWrapperStyle={styles.listColumns}
         renderItem={renderPokemonItem}
+        ListFooterComponent={renderFooter}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
       />
     </View>
   );
-};
-
-const styles = {
-  container: {
-    flex: 1,
-    padding: 10,
-    backgroundColor: '#fff',
-  },
-  listColumns: {
-    justifyContent: 'space-between',
-  },
-  card: {
-    margin: 10,
-    width: '48%',
-    borderRadius: 10,
-    elevation: 3,
-  },
-  cardImage: {
-    height: 150,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-  },
-  cardContent: {
-    alignItems: 'center',
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 10,
-    color: '#fff',
-    textAlign: 'center',
-  },
 };
 
 export default PokedexScreen;
