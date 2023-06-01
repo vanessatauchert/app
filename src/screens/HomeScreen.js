@@ -3,7 +3,10 @@ import { View, Text, Button } from 'react-native';
 
 const HomeScreen = ({ navigation }) => {
   const handleGoToPokedex = () => {
-    navigation.navigate('Pokedex');
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Pokedex' }],
+    });
   };
 
   return (

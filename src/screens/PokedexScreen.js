@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, ActivityIndicator, Text } from 'react-native';
 import { Button, Card, Title } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import Color from 'color';
 
@@ -11,6 +12,7 @@ import {
 } from '../utils/storage.js';
 
 const PokedexScreen = () => {
+  const navigation = useNavigation();
   const [pokemons, setPokemons] = useState([]);
   const [savedPokemons, setSavedPokemons] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -49,6 +51,7 @@ const PokedexScreen = () => {
       console.error('Erro ao buscar os Pokémon:', error);
     }
   };
+  
 
   const loadSavedPokemons = async () => {
     try {
@@ -89,6 +92,16 @@ const PokedexScreen = () => {
       );
     } catch (error) {
       console.error('Erro ao remover o Pokémon:', error);
+    }
+  };
+
+  const handlePokemonPress = async (pokemon) => {
+    try {
+      const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`);
+      const data = response.data;
+      navigation.navigate('PokemonDetails', { pokemon: data });
+    } catch (error) {
+      console.error('Erro ao buscar detalhes do Pokémon:', error);
     }
   };
 
@@ -167,7 +180,11 @@ const PokedexScreen = () => {
             {saveButtonLabel}
           </Button>
         </Card.Content>
+        <Card.Actions>
+          <Button onPress={() => handlePokemonPress(item)}>Detalhes</Button>
+        </Card.Actions>
       </Card>
+      
     );
   };
 
