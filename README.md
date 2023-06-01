@@ -19,7 +19,8 @@ Desenvolver um app utilizando React Native com Expo. O app deve possuir componen
 ## Imagens:
 
 
-![1685645524394 (2)](https://github.com/vanessatauchert/app/assets/60265204/5679abc2-ba6a-40c1-b23b-5ba0e4dbcea6)
+![1685645524394 (2)](https://github.com/vanessatauchert/app/assets/60265204/ca6e3003-f7c1-4187-aa05-3790c9968494)
+
 
 ## Passo 1:
 
