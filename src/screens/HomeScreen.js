@@ -17,8 +17,13 @@ const HomeScreen = ({ navigation }) => {
         resizeMode="contain"
       />
       <View style={styles.buttonContainer}>
-        <Text style={styles.text}>Bem-vindo!</Text>
+        <Text style={styles.texts}>Bem-vindo!</Text>
         <Button title="Ir para a Pokédex" onPress={handleGoToPokedex} />
+
+
+
+        <Text style={styles.text}>Desenvolvido por</Text>
+        <Text style={styles.texs}>Rafael Medeiros e Vanessa Oliveira</Text>
       </View>
     </View>
   );
@@ -43,6 +48,18 @@ const styles = StyleSheet.create({
   text: {
     marginBottom: 16,
     fontSize: 18,
+    marginTop: 100,
+    fontWeight: 'bold',
+  },
+  texts: {
+    marginBottom: 16,
+    fontSize: 22,
+    color: '#CD5C5C',
+    fontWeight: 'bold',
+  },
+  texs: {
+    marginBottom: 16,
+    fontSize: 16,
     fontWeight: 'bold',
   },
 });

@@ -51,7 +51,6 @@ const PokedexScreen = () => {
       console.error('Erro ao buscar os Pokémon:', error);
     }
   };
-  
 
   const loadSavedPokemons = async () => {
     try {
@@ -149,7 +148,17 @@ const PokedexScreen = () => {
     };
 
     const saveButtonTextStyle = {
-      color: item.isSaved ? '#fff' : '#000',
+      color: item.isSaved ? '#fff' : 'white',
+    };
+
+    const detailButtonStyle = {
+      marginTop: 10,
+      backgroundColor: '#FF7F50',
+      flex: 1,
+    };
+
+    const detailButtonTextStyle = {
+      color: '#FFFFFF',
     };
 
     const saveButtonLabel = item.isSaved ? 'Salvo' : 'Salvar';
@@ -175,6 +184,7 @@ const PokedexScreen = () => {
             <Text style={{ color: 'red' }}>Este Pokémon já foi salvo</Text>
           )}
           <Button
+            mode="contained"
             onPress={handleSaveButtonPress}
             style={saveButtonStyle}
             labelStyle={saveButtonTextStyle}
@@ -183,10 +193,16 @@ const PokedexScreen = () => {
           </Button>
         </Card.Content>
         <Card.Actions>
-          <Button onPress={() => handlePokemonPress(item)}>Detalhes</Button>
+          <Button
+            mode="contained"
+            onPress={() => handlePokemonPress(item)}
+            style={detailButtonStyle}
+            labelStyle={detailButtonTextStyle}
+          >
+            Detalhes
+          </Button>
         </Card.Actions>
       </Card>
-      
     );
   };
 
@@ -205,13 +221,13 @@ const PokedexScreen = () => {
     <View style={{ flex: 1 }}>
       <FlatList
         data={pokemons}
-        keyExtractor={(item, index) => item.id.toString()+ '_' + index.toString()}
+        keyExtractor={(item, index) => item.id.toString() + '_' + index.toString()}
         numColumns={2}
         renderItem={renderPokemonItem}
         ListFooterComponent={renderFooter}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
-        contentContainerStyle={{ flexGrow: 1 }} 
+        contentContainerStyle={{ flexGrow: 1 }}
       />
     </View>
   );

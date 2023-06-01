@@ -68,7 +68,7 @@ const PokedexDetailsScreen = ({ route }) => {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Stats:</Text>
+        <Text style={styles.sectionTitle}>Status:</Text>
         <View style={styles.statsContainer}>
           <View style={styles.statContainer}>
             <Text style={styles.statName}>HP</Text>

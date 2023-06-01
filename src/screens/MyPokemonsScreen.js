@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator } from 'react-native';
 import { Button, Card, Title } from 'react-native-paper';
 
 import { getPokemonList, removePokemonFromList } from '../utils/storage.js';
@@ -111,7 +111,8 @@ const MyPokemonScreen = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <Button onPress={handleRefresh} style={{ margin: 16 }}>
+      <Text style={{ margin: 16, fontSize: 16, fontWeight: 'bold', textAlign:'center' }}>Caso o Pokemon Salvo não seja carregado, clique no botão atualizar!</Text>
+      <Button onPress={handleRefresh} style={{ margin: 16, backgroundColor: '#E46E60' }}>
         Atualizar
       </Button>
       <FlatList
